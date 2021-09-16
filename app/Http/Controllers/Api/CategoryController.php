@@ -46,7 +46,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        $questions = $category->questions()->latest()->paginate(1);
+        $questions = $category->questions()->latest()->paginate(10);
 
         return QuestionResource::collection($questions)->additional(['result' => 1, 'message' => 'Retrieved.']);
     }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\ReplyController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,5 +35,8 @@ Route::middleware('auth:api')->group(function () {
   Route::apiResource('questions.replies', ReplyController::class)->shallow();
   Route::post('replies/{reply}/likes', [LikeController::class, 'store']);
   Route::delete('replies/{reply}/likes', [LikeController::class, 'destroy']);
-  
+  Route::post('notifications', [NotificationController::class, 'index']);
+  Route::post('markAsRead', [NotificationController::class, 'markAsRead']);
+  Route::post('replies/{reply}/bestReply', [ReplyController::class, 'bestReplyStore']);
+  Route::delete('replies/{reply}/bestReply', [ReplyController::class, 'bestReplyDestroy']);
 });

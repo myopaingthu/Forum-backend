@@ -14,7 +14,7 @@ class Reply extends Model
      *
      * @var array
      */
-    protected $fillable = ['body', 'question_id','user_id'];
+    protected $fillable = ['body', 'question_id','user_id', 'is_best_reply'];
 
      /**
     * Get the question that owns the reply.

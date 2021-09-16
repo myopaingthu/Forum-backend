@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Models\Reply;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use App\Events\BestReplyEvent;
+use App\Events\DeleteReplyEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ReplyResource;
+use App\Notifications\NewReplyNotification;
 
 class ReplyController extends Controller
 {
@@ -39,7 +42,12 @@ class ReplyController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        return success('Reply created successfully', null); 
+        $user = $question->user;
+        if ($reply->user_id !== $question->user_id) {
+            $user->notify(new NewReplyNotification($reply));
+        }
+
+        return success('Reply created successfully', new ReplyResource($reply)); 
     }
 
     /**
@@ -79,7 +87,40 @@ class ReplyController extends Controller
     public function destroy(Reply $reply)
     {
         $reply->delete();
-
+        broadcast(new DeleteReplyEvent($reply->id))->toOthers();
+        
         return success('Reply deleted successfully', null);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Models\Reply  $reply
+     * @return \Illuminate\Http\Response
+     */
+    public function bestReplyStore(Reply $reply)
+    {
+        $reply->update([
+            'is_best_reply' => 1,
+        ]);
+        broadcast(new BestReplyEvent($reply->id, 1))->toOthers();
+
+        return success('Best reply marked successfully',  null);
+    }
+
+     /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Reply  $reply
+     * @return \Illuminate\Http\Response
+     */
+    public function bestReplyDestroy(Reply $reply)
+    {
+        $reply->update([
+            'is_best_reply' => 0,
+        ]);
+        broadcast(new BestReplyEvent($reply->id, 0))->toOthers();
+
+        return success('Best reply unmarked successfully',  null);
     }
 }
