@@ -16,7 +16,7 @@ class QuestionController extends Controller
      */
     public function index()
     {
-        $questions = Question::latest()->paginate(1);
+        $questions = Question::latest()->paginate(10);
 
         return QuestionResource::collection($questions)->additional(['result' => 1, 'message' => 'Retrieved.']);
     }
@@ -37,7 +37,7 @@ class QuestionController extends Controller
 
         $question = auth()->user()->questions()->create($request->all());
         
-        return success('Question created successfully', null); 
+        return success('Question created successfully', new QuestionResource($question)); 
     }
 
     /**

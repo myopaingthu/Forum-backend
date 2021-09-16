@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Reply;
+use App\Events\LikeEvent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -18,6 +19,7 @@ class LikeController extends Controller
     public function store(Request $request, Reply $reply)
     {
         $reply->likes()->create(['user_id' => auth()->id()]);
+        broadcast(new LikeEvent($reply->id, 1))->toOthers();
 
         return success('Like created successfully', null);
     }
@@ -32,6 +34,7 @@ class LikeController extends Controller
     public function destroy(Reply $reply)
     {
         $reply->likes()->where('user_id', auth()->id())->first()->delete();
+        broadcast(new LikeEvent($reply->id, 0))->toOthers();
         
         return success('Like deleted successfully', null);
     }

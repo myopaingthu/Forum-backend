@@ -36,6 +36,16 @@ class Question extends Model
     }
 
     /**
+     * Get the question's path.
+     *
+     * @return string
+     */
+    public function getPathAttribute()
+    {
+        return "/question/$this->slug";
+    }
+
+    /**
      * Get the route key for the model.
      *
      * @return string
